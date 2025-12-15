@@ -43,8 +43,8 @@ def generate_data(n=12000):
         "Data Scientist": 70, "Machine Learning Engineer": 75, "AI Researcher": 85,
         "Software Engineer": 65, "Backend Engineer": 68, "Frontend Engineer": 60,
         "DevOps Engineer": 72, "Cloud Engineer": 74, "Data Analyst": 55,
-        "Business Analyst": 58, "Product Manager": 80, "Cybersecurity Analyst": 73,
-        "QA Engineer": 50, "IT Consultant": 62
+        "Business Analyst": 58, "Product Manager": 80,
+        "Cybersecurity Analyst": 73, "QA Engineer": 50, "IT Consultant": 62
     }
 
     country_bonus = {
@@ -71,7 +71,7 @@ def generate_data(n=12000):
 
 df = generate_data()
 
-# ---------------- Sidebar Filters ----------------
+# ---------------- Sidebar Filters (ALL SELECTBOXES) ----------------
 st.sidebar.title("🔍 Job Search Filters")
 
 selected_role = st.sidebar.selectbox(
@@ -79,27 +79,25 @@ selected_role = st.sidebar.selectbox(
     sorted(df["Role"].unique())
 )
 
-selected_country = st.sidebar.multiselect(
-    "Select Country",
-    df["Country"].unique(),
-    default=df["Country"].unique()
+selected_country = st.sidebar.selectbox(
+    "Select Location",
+    sorted(df["Country"].unique())
 )
 
-selected_work = st.sidebar.multiselect(
-    "Work Mode",
-    df["Work_Mode"].unique(),
-    default=df["Work_Mode"].unique()
+selected_work = st.sidebar.selectbox(
+    "Select Work Mode",
+    sorted(df["Work_Mode"].unique())
 )
 
 filtered_df = df[
     (df["Role"] == selected_role) &
-    (df["Country"].isin(selected_country)) &
-    (df["Work_Mode"].isin(selected_work))
+    (df["Country"] == selected_country) &
+    (df["Work_Mode"] == selected_work)
 ]
 
 # ---------------- Title ----------------
-st.title(f"💼 Job Market Analysis: {selected_role}")
-st.markdown("### AI-driven salary insights using simulated job market data")
+st.title(f"💼 {selected_role} Jobs in {selected_country}")
+st.markdown(f"### Work Mode: {selected_work} | AI-driven salary insights")
 
 # ---------------- KPIs ----------------
 c1, c2, c3, c4 = st.columns(4)
@@ -115,22 +113,23 @@ tab1, tab2, tab3 = st.tabs(["📊 Market Overview", "📈 Trends", "🤖 AI Sala
 with tab1:
     col1, col2 = st.columns(2)
 
-    fig_role_salary = px.bar(
-        filtered_df.groupby("Country")["Salary"].mean().reset_index(),
-        x="Country",
-        y="Salary",
-        title="Average Salary by Country",
-        labels={"Salary": "Salary (€K)"}
-    )
-    col1.plotly_chart(fig_role_salary, use_container_width=True)
-
     fig_company = px.box(
         filtered_df,
         x="Company_Size",
         y="Salary",
-        title="Salary Distribution by Company Size"
+        title="Salary Distribution by Company Size",
+        labels={"Salary": "Salary (€K)"}
     )
-    col2.plotly_chart(fig_company, use_container_width=True)
+    col1.plotly_chart(fig_company, use_container_width=True)
+
+    fig_edu = px.bar(
+        filtered_df.groupby("Education")["Salary"].mean().reset_index(),
+        x="Education",
+        y="Salary",
+        title="Average Salary by Education Level",
+        labels={"Salary": "Salary (€K)"}
+    )
+    col2.plotly_chart(fig_edu, use_container_width=True)
 
 # -------- TAB 2: Trends --------
 with tab2:
@@ -138,7 +137,7 @@ with tab2:
         filtered_df,
         x="Experience",
         y="Salary",
-        color="Education",
+        color="Company_Size",
         title="Experience vs Salary Trend",
         labels={"Salary": "Salary (€K)"}
     )
@@ -161,5 +160,5 @@ with tab3:
         st.success(f"💰 Estimated Salary: €{prediction:.2f}K")
 
 # ---------------- Data Preview ----------------
-st.subheader("📄 Data Preview (Simulated)")
+st.subheader("📄 Simulated Job Listings")
 st.dataframe(filtered_df.head(20))
