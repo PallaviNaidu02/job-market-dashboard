@@ -4,7 +4,7 @@ import numpy as np
 import plotly.express as px
 from sklearn.ensemble import RandomForestRegressor
 
-# ---------------- Page Config ----------------
+
 st.set_page_config(
     page_title="AI Job Market Dashboard",
     layout="wide",
@@ -71,7 +71,7 @@ def generate_data(n=12000):
 
 df = generate_data()
 
-# ---------------- Sidebar Filters (ALL SELECTBOXES) ----------------
+
 st.sidebar.title("🔍 Job Search Filters")
 
 selected_role = st.sidebar.selectbox(
