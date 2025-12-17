@@ -11,7 +11,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ---------------- Generate Synthetic Data ----------------
+# ----------------  Synthetic Data ----------------
 @st.cache_data
 def generate_data(n=12000):
     np.random.seed(42)
